@@ -6,10 +6,16 @@ import {
   join,
   resolve,
   extname,
-} from "./deps.ts";
-import { ff } from "./file_fetcher.ts";
-import { protocol } from "./helpers.ts";
-import { Cache } from "./mod.ts";
+  URL,
+  remove,
+  lstat,
+  readJSON,
+  writeFile,
+  Stats
+} from "./deps";
+import { ff } from "./file_fetcher";
+import { protocol } from "./helpers";
+import { Cache } from "./mod";
 
 export interface Policy {
   maxAge: number;
@@ -44,7 +50,7 @@ interface IFile {
   path: string;
   metapath: string;
   meta: Metadata;
-  lstat: Deno.FileInfo;
+  lstat: Stats;
   origin: Origin;
 
   policy?: Policy;
@@ -74,8 +80,8 @@ export class FileWrapper {
   }
 
   async remove(): Promise<void> {
-    await Deno.remove(this.path);
-    await Deno.remove(this.metapath);
+    await remove(this.path);
+    await remove(this.metapath);
   }
 
   async ensure(): Promise<void> {
@@ -86,7 +92,7 @@ export class FileWrapper {
     const meta = await metaread(this.url, this.ns);
     return {
       ...this,
-      lstat: await Deno.lstat(this.path),
+      lstat: await lstat(this.path),
       meta,
       origin: Origin.CACHE,
     };
@@ -97,7 +103,7 @@ export class FileWrapper {
     await metasave(meta, this.url, this.ns);
     return {
       ...this,
-      lstat: await Deno.lstat(this.path),
+      lstat: await lstat(this.path),
       meta,
       origin: Origin.FETCH,
     };
@@ -133,10 +139,9 @@ function metapath(url: URL, ns?: string) {
 }
 
 async function metasave(meta: Metadata, url: URL, ns?: string): Promise<void> {
-  await Deno.writeTextFile(metapath(url, ns), JSON.stringify(meta));
+  await writeFile(metapath(url, ns), JSON.stringify(meta));
 }
 
 async function metaread(url: URL, ns?: string): Promise<Metadata> {
-  const metadata = await Deno.readTextFile(metapath(url, ns));
-  return JSON.parse(metadata) as Metadata;
+  return readJSON(metapath(url, ns));
 }

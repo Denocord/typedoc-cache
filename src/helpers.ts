@@ -1,5 +1,5 @@
-import { CacheError } from "./cache.ts";
-import { join, resolve } from "./deps.ts";
+import { CacheError } from "./cache";
+import { join, resolve, URL } from "./deps";
 
 export function protocol(protocol: string) {
   return protocol.slice(0, -1);

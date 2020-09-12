@@ -1,7 +1,7 @@
-import { join, exists as _exists } from "./deps.ts";
-import { cachedir } from "./directories.ts";
-import { File, FileWrapper, Origin, Policy, RELOAD_POLICY } from "./file.ts";
-import { toURL } from "./helpers.ts";
+import { join, exists as _exists, URL, remove as _remove } from "./deps";
+import { cachedir } from "./directories";
+import { File, FileWrapper, Origin, Policy, RELOAD_POLICY } from "./file";
+import { toURL } from "./helpers";
 
 export { File, Policy, Origin, RELOAD_POLICY };
 
@@ -83,7 +83,7 @@ export async function purge(ns?: string): Promise<boolean> {
   if (ns) dir.push(ns);
   const path = join(...dir);
   if (!(await _exists(path))) return false;
-  await Deno.remove(path, { recursive: true });
+  await _remove(path);
   return true;
 }
 

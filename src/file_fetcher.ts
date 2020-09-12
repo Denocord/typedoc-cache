@@ -1,7 +1,7 @@
-import { CacheError } from "./cache.ts";
-import { exists, join, resolve } from "./deps.ts";
-import { Metadata } from "./file.ts";
-import { protocol } from "./helpers.ts";
+import { CacheError } from "./cache";
+import { exists, URL, copyFile, writeFile, fetch } from "./deps";
+import { Metadata } from "./file";
+import { protocol } from "./helpers";
 
 async function protocolFile(url: URL, path: string): Promise<Metadata> {
   const { pathname } = url;
@@ -12,7 +12,7 @@ async function protocolFile(url: URL, path: string): Promise<Metadata> {
   } catch {
     throw new CacheError(`${pathname} is not valid.`);
   }
-  await Deno.copyFile(pathname, path);
+  await copyFile(pathname, path);
   return {
     url: url.href,
   };
@@ -22,7 +22,7 @@ async function protocolHttp(url: URL, path: string): Promise<Metadata> {
   const download = await fetch(url);
   if (!download.ok) throw new CacheError(download.statusText);
   const source = await download.arrayBuffer();
-  await Deno.writeFile(path, new Uint8Array(source));
+  await writeFile(path, new Uint8Array(source));
 
   const headers: { [key: string]: string } = {};
   for (const [key, value] of download.headers) {
