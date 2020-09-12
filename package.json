@@ -1,7 +1,7 @@
 {
   "name": "@denocord/typedoc-cache",
   "description": "Deno cache library for typedoc-deno",
-  "version": "0.0.6",
+  "version": "0.0.6-e1",
   "dependencies": {
     "@types/node": "^14.10.1",
     "@types/node-fetch": "^2.5.7",

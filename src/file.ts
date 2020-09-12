@@ -124,7 +124,7 @@ export class FileWrapper {
 
 function hash(url: URL) {
   const formatted = `${url.pathname}${url.search ? "?" + url.search : ""}`;
-  return createHash("sha256").update(formatted).toString();
+  return createHash("sha256").update(formatted).digest("hex");
 }
 
 function path(url: URL, ns?: string) {
